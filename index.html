@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toronto University Chat</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+            margin: 0;
+            padding: 0;
+        }
+        .container-fluid {
+            padding-top: 70px;
+            height: 100vh;
+        }
+        .chat-section {
+            max-height: calc(100vh - 140px);
+            overflow-y: auto;
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 10px;
+        }
+        .message {
+            max-width: 70%;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 15px;
+            font-size: 16px;
+            clear: both;
+        }
+        .user-message {
+            background-color: #007bff;
+            color: #fff;
+            float: right;
+        }
+        .bot-message {
+            background-color: #6c757d;
+            color: #fff;
+            float: left;
+        }
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+        .loading-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 4px solid transparent;
+            border-top-color: #007bff;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 300px;
+            background-color: #007bff;
+            padding-top: 20px;
+            color: #fff;
+            transition: width 0.3s;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+            flex-direction: column;
+            border-top-right-radius: 25px;
+            border-bottom-right-radius: 25px;
+            box-shadow: 5px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar:hover {
+            width: 320px;
+        }
+        .main-content {
+            margin-left: 300px;
+            padding: 20px;
+        }
+        .chat-title {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #007bff;
+        }
+        .help-text {
+            font-size: 20px;
+            text-align: center;
+        }
+        .input-group {
+            position: fixed;
+            bottom: 20px;
+            width: calc(100% - 340px);
+            margin-left: 310px;
+            z-index: 1;
+        }
+        .input-group .form-control {
+            border-radius: 25px;
+        }
+        .input-group-prepend .btn {
+            border-radius: 25px;
+            font-weight: bold;
+        }
+        .sidebar-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            margin-left: 20px;
+            color: #fff;
+        }
+        .sidebar-section {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 15px;
+        }
+        .sidebar-section:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .sidebar-section:hover .sidebar-section-text {
+            color: #fff;
+        }
+        .sidebar-section:hover .sidebar-section-icon {
+            color: #fff;
+        }
+        .sidebar-section-icon {
+            margin-right: 15px;
+            font-size: 24px;
+            color: #fff;
+            width: 30px;
+            text-align: center;
+        }
+        .sidebar-section-text {
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: #d3d3d3;
+            transition: all 0.3s;
+        }
+        .sidebar-content {
+            display: none;
+            padding: 10px 20px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-title">Toronto University Chat</div>
+        <div class="sidebar-section" onclick="toggleContent('overview')">
+            <span class="sidebar-section-icon">&#128202;</span>
+            <span class="sidebar-section-text">Overview</span>
+        </div>
+        <div class="sidebar-content" id="overview-content">
+            This is Toronto University chat bot. <br>
+            You can ask whatever you need to know about the Confluence documentation.
+        </div>
+        <div class="sidebar-section" onclick="toggleContent('help')">
+            <span class="sidebar-section-icon">&#10067;</span>
+            <span class="sidebar-section-text">Help</span>
+        </div>
+        <div class="sidebar-content" id="help-content">
+            Please ask any question that is related to Confluence documentation. <br>
+            Bot can answer you, if data is exist in Confluence.
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <div class="main-content">
+            <div class="chat-section" id="chat-section">
+                <h1 class="chat-title">Please ask your question</h1>
+                <div class="message bot-message">Welcome! How can I assist you?</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input Section -->
+    <div class="input-group">
+        <input type="text" id="message-input" class="form-control" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
+        <div class="input-group-prepend">
+            <button type="submit" class="btn btn-primary" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function toggleContent(section) {
+            var content = document.getElementById(section + "-content");
+            if (content.style.display === "none" || content.style.display === "") {
+                content.style.display = "block";
+            } else {
+                content.style.display = "none";
+            }
+        }
+
+        function sendMessage() {
+            var message = document.getElementById("message-input").value;
+            if (message.trim() === "") return;
+
+            var chatSection = document.getElementById("chat-section");
+
+            // Create a user message container
+            var userMessageContainer = document.createElement("div");
+            userMessageContainer.className = "message user-message";
+            userMessageContainer.textContent = message;
+
+            // Append the user message container to the chat section
+            chatSection.appendChild(userMessageContainer);
+
+            // Scroll to bottom after adding the user message
+            chatSection.scrollTop = chatSection.scrollHeight;
+
+            // Show loading indicator
+            var loadingContainer = document.createElement("div");
+            loadingContainer.className = "loading-container";
+            var loadingCircle = document.createElement("div");
+            loadingCircle.className = "loading-circle";
+            loadingContainer.appendChild(loadingCircle);
+            chatSection.appendChild(loadingContainer);
+
+            // Send request to the endpoint
+            fetch("http://192.168.8.10:8000/ask?q=" + encodeURIComponent(message))
+                .then(response => response.json())
+                .then(data => {
+                    // Remove loading indicator
+                    chatSection.removeChild(loadingContainer);
+
+                    // Create a bot message container
+                    var botMessageContainer = document.createElement("div");
+                    botMessageContainer.className = "message bot-message";
+                    botMessageContainer.textContent = data.answer;
+
+                    // Append the bot message container to the chat section
+                    chatSection.appendChild(botMessageContainer);
+
+                    // Scroll to bottom after adding the bot message
+                    chatSection.scrollTop = chatSection.scrollHeight;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Remove loading indicator
+                    chatSection.removeChild(loadingContainer);
+
+                    // Create a bot message container
+                    var botMessageContainer = document.createElement("div");
+                    botMessageContainer.className = "message bot-message";
+                    botMessageContainer.textContent = "Sorry, something went wrong while processing your request.";
+
+                    // Append the bot message container to the chat section
+                    chatSection.appendChild(botMessageContainer);
+
+                    // Scroll to bottom after adding the bot message
+                    chatSection.scrollTop = chatSection.scrollHeight;
+                });
+
+            // Clear input
+            document.getElementById("message-input").value = "";
+        }
+
+        function handleKeyPress(event) {
+            if (event.keyCode === 13) {
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+</html>
