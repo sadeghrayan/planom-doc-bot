@@ -236,7 +236,7 @@
             chatSection.appendChild(loadingContainer);
 
             // Send request to the endpoint
-            fetch("http://192.168.8.10:8000/ask?q=" + encodeURIComponent(message))
+            fetch("http://127.0.0.1:8000/ask?q=" + encodeURIComponent(message))
                 .then(response => response.json())
                 .then(data => {
                     // Remove loading indicator
