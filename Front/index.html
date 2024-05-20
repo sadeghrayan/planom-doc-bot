@@ -236,39 +236,37 @@
             chatSection.appendChild(loadingContainer);
 
             // Send request to the endpoint
-            fetch("http://127.0.0.1:8000/ask?q=" + encodeURIComponent(message))
-                .then(response => response.json())
-                .then(data => {
-                    // Remove loading indicator
-                    chatSection.removeChild(loadingContainer);
+            fetch("http://192.168.8.10:8000/ask", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ q: message })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Remove loading indicator
+            chatSection.removeChild(loadingContainer);
 
-                    // Create a bot message container
-                    var botMessageContainer = document.createElement("div");
-                    botMessageContainer.className = "message bot-message";
-                    botMessageContainer.textContent = data.answer;
+            // Create a bot message container
+            var botMessageContainer = document.createElement("div");
+            botMessageContainer.className = "message bot-message";
+            botMessageContainer.textContent = data.answer;
+            chatSection.appendChild(botMessageContainer);
+            chatSection.scrollTop = chatSection.scrollHeight;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Remove loading indicator
+            chatSection.removeChild(loadingContainer);
 
-                    // Append the bot message container to the chat section
-                    chatSection.appendChild(botMessageContainer);
-
-                    // Scroll to bottom after adding the bot message
-                    chatSection.scrollTop = chatSection.scrollHeight;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    // Remove loading indicator
-                    chatSection.removeChild(loadingContainer);
-
-                    // Create a bot message container
-                    var botMessageContainer = document.createElement("div");
-                    botMessageContainer.className = "message bot-message";
-                    botMessageContainer.textContent = "Sorry, something went wrong while processing your request.";
-
-                    // Append the bot message container to the chat section
-                    chatSection.appendChild(botMessageContainer);
-
-                    // Scroll to bottom after adding the bot message
-                    chatSection.scrollTop = chatSection.scrollHeight;
-                });
+            // Create a bot message container with error message
+            var botMessageContainer = document.createElement("div");
+            botMessageContainer.className = "message bot-message";
+            botMessageContainer.textContent = "Sorry, something went wrong while processing your request.";
+            chatSection.appendChild(botMessageContainer);
+            chatSection.scrollTop = chatSection.scrollHeight;
+        });
 
             // Clear input
             document.getElementById("message-input").value = "";
