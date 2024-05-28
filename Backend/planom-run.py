@@ -40,7 +40,9 @@ def ask_a_question(question: Question):
     return {"question": question.q, "answer": response}
 
 def ask_llm(similar_docs, question):
-    informed_context = similar_docs[0].page_content
+    #informed_context = similar_docs[0].page_content
+    informed_context= [doc.page_content for doc in similar_docs]
+
     informed_response = llm_chain_informed.run(context=informed_context, question=question)
     return informed_response
 
