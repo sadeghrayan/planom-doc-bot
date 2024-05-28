@@ -25,9 +25,13 @@ def getFlanLarge():
     
     pipe = pipeline(
         "text2text-generation",
-        model=model, 
-        tokenizer=tokenizer, 
-        max_length=100
+        model=model,
+        tokenizer=tokenizer,
+        max_length=700,  # Adjust max_length based on your requirement
+        num_return_sequences=1,  # Number of sequences to generate
+        do_sample=True,  # Enable sampling to speed up
+        top_k=10,  # Set top_k to limit the number of tokens considered
+        top_p=0.95,  # Set top_p for nucleus sampling
     )
     llm = HuggingFacePipeline(pipeline=pipe)
     return llm
