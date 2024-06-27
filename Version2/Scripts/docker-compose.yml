@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  chat:
+      build:
+        context: ./chatbot-rag-app
+      ports:
+        - "4000:4000"
+      depends_on:
+        - elasticsearch_db 
+      environment:
+          ELASTICSEARCH_URL: "http://192.168.8.10:9200"
+          ES_INDEX: "workplace-app-docs"
+          ES_INDEX_CHAT_HISTORY: "workplace-app-docs-chat-history"
+          LLM_TYPE: "ollama"
+          OLLAMA_API_ENDPOINT: "http://192.168.8.108:11434"
+          GEMMA_MODEL: "tinyllama"
