@@ -42,7 +42,7 @@ def ask_question(question, session_id):
         #condensed_question = get_llm().invoke(condense_question_prompt)
         content = []
         context = ""
-        for logs_entry in get_llm.stream(condense_question_prompt):
+        for logs_entry in get_llm().stream(condense_question_prompt):
             content = logs_entry['response']
             context += content
         condensed_question = context    
